@@ -1,0 +1,44 @@
+<.header>
+  Listing Berichtshefte
+  <:actions>
+    <.link patch={~p"/berichtshefte/new"}>
+      <.button>New Berichtsheft</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.table
+  id="berichtshefte"
+  rows={@streams.berichtshefte}
+  row_click={fn {_id, berichtsheft} -> JS.navigate(~p"/berichtshefte/#{berichtsheft}") end}
+>
+  <:col :let={{_id, berichtsheft}} label="Berichtsheftnummer"><%= berichtsheft.berichtsheftnummer %></:col>
+  <:col :let={{_id, berichtsheft}} label="Datum von"><%= berichtsheft.datum_von %></:col>
+  <:col :let={{_id, berichtsheft}} label="Datum bis"><%= berichtsheft.datum_bis %></:col>
+  
+  <:action :let={{_id, berichtsheft}}>
+    <div class="sr-only">
+      <.link navigate={~p"/berichtshefte/#{berichtsheft}"}>Show</.link>
+    </div>
+    <.link patch={~p"/berichtshefte/#{berichtsheft}/edit"}>Edit</.link>
+  </:action>
+  <:action :let={{id, berichtsheft}}>
+    <.link
+      phx-click={JS.push("delete", value: %{id: berichtsheft.id}) |> hide("##{id}")}
+      data-confirm="Are you sure?"
+    >
+      Delete
+    </.link>
+  </:action>
+</.table>
+
+<.modal :if={@live_action in [:new, :edit]} id="berichtsheft-modal" show on_cancel={JS.patch(~p"/berichtshefte")}>
+  <.live_component
+    module={DemoWeb.BerichtsheftLive.FormComponent}
+    id={@berichtsheft.id || :new}
+    title={@page_title}
+    action={@live_action}
+    berichtsheft={@berichtsheft}
+    patch={~p"/berichtshefte"}
+  />
+</.modal>

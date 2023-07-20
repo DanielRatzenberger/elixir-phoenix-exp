@@ -1,0 +1,42 @@
+<.header>
+  Listing Inhalte
+  <:actions>
+    <.link patch={~p"/inhalte/new"}>
+      <.button>New Inhalt</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.table
+  id="inhalte"
+  rows={@streams.inhalte}
+  row_click={fn {_id, inhalt} -> JS.navigate(~p"/inhalte/#{inhalt}") end}
+>
+  <:col :let={{_id, inhalt}} label="Wochentag"><%= inhalt.wochentag %></:col>
+  <:col :let={{_id, inhalt}} label="Inhalt"><%= inhalt.inhalt %></:col>
+  <:action :let={{_id, inhalt}}>
+    <div class="sr-only">
+      <.link navigate={~p"/inhalte/#{inhalt}"}>Show</.link>
+    </div>
+    <.link patch={~p"/inhalte/#{inhalt}/edit"}>Edit</.link>
+  </:action>
+  <:action :let={{id, inhalt}}>
+    <.link
+      phx-click={JS.push("delete", value: %{id: inhalt.id}) |> hide("##{id}")}
+      data-confirm="Are you sure?"
+    >
+      Delete
+    </.link>
+  </:action>
+</.table>
+
+<.modal :if={@live_action in [:new, :edit]} id="inhalt-modal" show on_cancel={JS.patch(~p"/inhalte")}>
+  <.live_component
+    module={DemoWeb.InhaltLive.FormComponent}
+    id={@inhalt.id || :new}
+    title={@page_title}
+    action={@live_action}
+    inhalt={@inhalt}
+    patch={~p"/inhalte"}
+  />
+</.modal>
